@@ -1,0 +1,37 @@
+#include <LiquidCrystal.h> 
+LiquidCrystal lcd(12, 11, 7, 6, 5, 4);//Establish pins
+
+void centerText(String text, int row) {
+  int length = text.length();
+  int spaces = (16 - length) / 2;
+  lcd.setCursor(spaces, row);
+  lcd.print(text);
+} //Takes string and row and prints text on cursor point
+
+void setup() {
+  lcd.begin(16, 2);
+  Serial.begin(9600);
+  Serial.println("Enter phrase: ");
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    String input = Serial.readStringUntil('\n');
+    input.trim();// Remove extra spaces at bgng and end
+    lcd.clear();// Clear LCD
+
+    if (input.length() <= 16){
+      centerText(input, 0);
+    }
+    else {
+      int breakPoint = input.lastIndexOf(' ', 16);// Find the last space before char 16
+      if(breakPoint == -1) {
+        breakPoint = 16; //If no space force cut at 16
+      }
+      String line1 = input.substring(0, breakPoint);
+      String line2 = input.substring(breakPoint);
+      centerText(line1, 0);
+      centerText(line2, 1);
+    }
+  }
+}
